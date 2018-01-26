@@ -67,10 +67,8 @@ class CreateUserActivity : AppCompatActivity() {
                         if (loginSuccess) {
                             AuthService.createUser(this, username, email, userAvatar, avatarColor) { createSuccess ->
                                 if (createSuccess) {
-
                                     val userDataChange = Intent(BROADCAST_USER_DATA_CHANGE)
                                     LocalBroadcastManager.getInstance(this).sendBroadcast(userDataChange)
-
                                     enableSpinner(false)
                                     finish()
                                 } else {
