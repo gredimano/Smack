@@ -1,11 +1,10 @@
-package com.redredimano.smack
+package com.redredimano.smack.Controller
 
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory
 import android.view.View
+import com.redredimano.smack.R
 import kotlinx.android.synthetic.main.activity_create_user.*
 import java.util.*
 
