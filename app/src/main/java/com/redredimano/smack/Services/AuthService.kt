@@ -9,9 +9,6 @@ import com.android.volley.toolbox.Volley
 import com.redredimano.smack.Utilities.URL_REGISTER
 import org.json.JSONObject
 
-/**
- * Created by red on 26/01/2018.
- */
 object AuthService {
 
     fun registerUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
