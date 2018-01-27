@@ -9,8 +9,11 @@ import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import com.redredimano.smack.R
 import com.redredimano.smack.Services.AuthService
 import com.redredimano.smack.Services.UserDataService
@@ -29,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
-
+        hideKeyBoard()
 
         LocalBroadcastManager.getInstance(this).registerReceiver(userDataChangeReceiver, IntentFilter(BROADCAST_USER_DATA_CHANGE))
     }
@@ -55,6 +58,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun hideKeyBoard() {
+        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        if (inputManager.isAcceptingText) {
+            inputManager.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        }
+    }
+
     fun loginBtnNavClicked(view: View) {
 
         if (AuthService.isLoggedIn) {
@@ -71,7 +82,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun addChannelClicked(view: View) {
+        if (AuthService.isLoggedIn) {
+            val builder = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
 
+            builder.setView(dialogView)
+                    .setPositiveButton("Add") { dialogInterface, i ->
+                        val nameTextField = dialogView.findViewById<EditText>(R.id.addChannelNameTxt)
+                        val descTextField = dialogView.findViewById<EditText>(R.id.addChannelDescTxt)
+                        val channelName = nameTextField.text.toString()
+                        val channelDesc = descTextField.text.toString()
+
+                        // Create channel with the channel name and description.
+                        hideKeyBoard()
+                    }
+                    .setNegativeButton("Cancel") { dialogInterface, i ->
+                        hideKeyBoard()
+                    }
+                    .show()
+        } else {
+
+        }
     }
 
     fun sendMessageBtnClicked(view: View) {
