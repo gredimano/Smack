@@ -12,9 +12,11 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.redredimano.smack.Model.Channel
+import com.redredimano.smack.Model.Message
 import com.redredimano.smack.R
 import com.redredimano.smack.Services.AuthService
 import com.redredimano.smack.Services.MessageService
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         socket.connect()
         socket.on("channelCreated", onNewChannel)
+        socket.on("messageCreated", onNewMessage)
 
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
@@ -158,7 +161,43 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun sendMessageBtnClicked(view: View) {
+    private val onNewMessage = Emitter.Listener { args ->
+        runOnUiThread {
+            val messageBody = args[0] as String
+            val channelId = args[2] as String
+            val userName = args[3] as String
+            val userAvatar = args[4] as String
+            val userAvatarColor = args[5] as String
+            val id = args[6] as String
+            val timestamp = args[7] as String
 
+            val newMessage = Message(messageBody, userName, channelId, userAvatar, userAvatarColor, id, timestamp)
+            MessageService.messages.add(newMessage)
+            println(newMessage.message)
+        }
+    }
+
+    fun sendMessageBtnClicked(view: View) {
+        if (App.prefs.isLoggedIn && messageTextField.text.isNotEmpty() && selectedChannel != null) {
+            val userId = UserDataService.id
+            val channelId = selectedChannel!!.id
+            socket.emit("newMessage",
+                    messageTextField.text.toString(),
+                    userId,
+                    channelId,
+                    UserDataService.name,
+                    UserDataService.avatarName,
+                    UserDataService.avatarColor
+            )
+            messageTextField.text.clear()
+            hideKeyBoard()
+        }
+    }
+
+    private fun hideKeyBoard() {
+        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (inputManager.isAcceptingText) {
+            inputManager.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        }
     }
 }
